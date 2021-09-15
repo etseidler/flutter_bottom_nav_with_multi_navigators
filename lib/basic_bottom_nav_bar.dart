@@ -22,10 +22,6 @@ class _BasicBottomNavBarState extends State<BasicBottomNavBar> {
       size: 150,
     ),
     NavItem.camera: CameraPage(),
-    // NavItem.camera2: Icon(
-    //   Icons.ac_unit,
-    //   size: 150,
-    // ),
     NavItem.chats: Icon(
       Icons.chat,
       size: 150,
@@ -33,14 +29,21 @@ class _BasicBottomNavBarState extends State<BasicBottomNavBar> {
   };
   int _selectedIndex = 0;
 
-  final navigatorKey = GlobalKey<NavigatorState>();
+  var _currentTab = NavItem.calls;
+  final _navigatorKeys = {
+    NavItem.calls: GlobalKey<NavigatorState>(),
+    NavItem.camera: GlobalKey<NavigatorState>(),
+    NavItem.chats: GlobalKey<NavigatorState>(),
+  };
 
-  void _push() {
-    Navigator.of(context).push(MaterialPageRoute(
-      // we'll look at ColorDetailPage later
-      builder: (context) =>
-          SimpleDetailPage(text: 'Detail Text', title: 'DetailTitle'),
-    ));
+  Widget _buildOffstageNavigator(NavItem navItem) {
+    return Offstage(
+      offstage: _currentTab != navItem,
+      child: TabNavigator(
+        navigatorKey: _navigatorKeys[navItem]!,
+        navItem: navItem,
+      ),
+    );
   }
 
   @override
@@ -50,16 +53,11 @@ class _BasicBottomNavBarState extends State<BasicBottomNavBar> {
       child: BlocBuilder<NavBloc, NavState>(
         builder: (context, state) {
           return Scaffold(
-            // appBar: AppBar(
-            //   title: const Text('BottomNavigationBar Demo'),
-            // ),
-            // body: Center(
-            //   child: _pages[state.selectedItem],
-            // ),
-            body: TabNavigator(
-              navigatorKey: navigatorKey,
-              navItem: state.selectedItem,
-            ),
+            body: Stack(children: <Widget>[
+              _buildOffstageNavigator(NavItem.calls),
+              _buildOffstageNavigator(NavItem.camera),
+              _buildOffstageNavigator(NavItem.chats),
+            ]),
             bottomNavigationBar: BottomNavigationBar(
               currentIndex: _selectedIndex,
               items: _listItems
@@ -68,6 +66,7 @@ class _BasicBottomNavBarState extends State<BasicBottomNavBar> {
               onTap: (int index) {
                 setState(() {
                   _selectedIndex = index;
+                  _currentTab = _listItems[index].item;
                 });
                 BlocProvider.of<NavBloc>(context)
                     .add(NavigateTo(_listItems[index].item));
@@ -95,13 +94,6 @@ final List<_NavigationItem> _listItems = [
         icon: Icon(Icons.camera),
         label: 'Camera',
       )),
-  // _NavigationItem(
-  //     NavItem.camera2,
-  //     "Camera 2",
-  //     BottomNavigationBarItem(
-  //       icon: Icon(Icons.camera),
-  //       label: 'Camera',
-  //     )),
   _NavigationItem(
       NavItem.chats,
       "Chat",
