@@ -14,14 +14,24 @@ class TabNavigatorRoutes {
 // 2
 class TabNavigator extends StatelessWidget {
   final GlobalKey<NavigatorState> navigatorKey;
-  final NavItem navItem;
-  TabNavigator({required this.navigatorKey, required this.navItem});
+  final Icon icon;
+  final String pageText;
+  final String titleText;
+  TabNavigator({
+    required this.navigatorKey,
+    required this.icon,
+    required this.pageText,
+    required this.titleText,
+  });
 
   // 3
   Map<String, WidgetBuilder> _routeBuilders(BuildContext context) {
     return {
       TabNavigatorRoutes.root: (context) => SimplePage(
-          text: 'Simple', title: 'Simple Title', onPush: () => _push(context)),
+          text: pageText,
+          title: titleText,
+          icon: icon,
+          onPush: () => _push(context)),
       TabNavigatorRoutes.detail: (context) => SimpleDetailPage(
             text: 'Simple Detail',
             title: 'Simple Detail Title',
