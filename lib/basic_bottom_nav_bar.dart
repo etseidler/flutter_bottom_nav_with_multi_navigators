@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:nested_nav/bloc/nav/simple_detail.dart';
+import 'package:nested_nav/bloc/tab_navigator.dart';
 import 'package:nested_nav/camera_page.dart';
 
 import 'bloc/nav/nav_bloc.dart';
@@ -31,6 +33,16 @@ class _BasicBottomNavBarState extends State<BasicBottomNavBar> {
   };
   int _selectedIndex = 0;
 
+  final navigatorKey = GlobalKey<NavigatorState>();
+
+  void _push() {
+    Navigator.of(context).push(MaterialPageRoute(
+      // we'll look at ColorDetailPage later
+      builder: (context) =>
+          SimpleDetailPage(text: 'Detail Text', title: 'DetailTitle'),
+    ));
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider<NavBloc>(
@@ -38,11 +50,15 @@ class _BasicBottomNavBarState extends State<BasicBottomNavBar> {
       child: BlocBuilder<NavBloc, NavState>(
         builder: (context, state) {
           return Scaffold(
-            appBar: AppBar(
-              title: const Text('BottomNavigationBar Demo'),
-            ),
-            body: Center(
-              child: _pages[state.selectedItem],
+            // appBar: AppBar(
+            //   title: const Text('BottomNavigationBar Demo'),
+            // ),
+            // body: Center(
+            //   child: _pages[state.selectedItem],
+            // ),
+            body: TabNavigator(
+              navigatorKey: navigatorKey,
+              navItem: state.selectedItem,
             ),
             bottomNavigationBar: BottomNavigationBar(
               currentIndex: _selectedIndex,
