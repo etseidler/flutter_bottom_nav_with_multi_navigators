@@ -62,34 +62,40 @@ class _BasicBottomNavBarState extends State<BasicBottomNavBar> {
       create: (context) => NavBloc(),
       child: BlocBuilder<NavBloc, NavState>(
         builder: (context, state) {
-          return Scaffold(
-            body: Stack(children: <Widget>[
-              _pages[NavItem.calls]!,
-              _buildOffstageNavigator(NavItem.camera,
-                  Icon(Icons.camera, size: 150), 'Camera Page', 'Camera Title'),
-              _buildOffstageNavigator(
-                NavItem.chats,
-                Icon(
-                  Icons.chat,
-                  size: 150,
+          return WillPopScope(
+            onWillPop: () async => false,
+            child: Scaffold(
+              body: Stack(children: <Widget>[
+                _pages[NavItem.calls]!,
+                _buildOffstageNavigator(
+                    NavItem.camera,
+                    Icon(Icons.camera, size: 150),
+                    'Camera Page',
+                    'Camera Title'),
+                _buildOffstageNavigator(
+                  NavItem.chats,
+                  Icon(
+                    Icons.chat,
+                    size: 150,
+                  ),
+                  'Chats Page',
+                  'Chats Title',
                 ),
-                'Chats Page',
-                'Chats Title',
+              ]),
+              bottomNavigationBar: BottomNavigationBar(
+                currentIndex: _selectedIndex,
+                items: _listItems
+                    .map<BottomNavigationBarItem>((li) => li.bottomNavBarItem)
+                    .toList(),
+                onTap: (int index) {
+                  setState(() {
+                    _selectedIndex = index;
+                    _currentTab = _listItems[index].item;
+                  });
+                  BlocProvider.of<NavBloc>(context)
+                      .add(NavigateTo(_listItems[index].item));
+                },
               ),
-            ]),
-            bottomNavigationBar: BottomNavigationBar(
-              currentIndex: _selectedIndex,
-              items: _listItems
-                  .map<BottomNavigationBarItem>((li) => li.bottomNavBarItem)
-                  .toList(),
-              onTap: (int index) {
-                setState(() {
-                  _selectedIndex = index;
-                  _currentTab = _listItems[index].item;
-                });
-                BlocProvider.of<NavBloc>(context)
-                    .add(NavigateTo(_listItems[index].item));
-              },
             ),
           );
         },
